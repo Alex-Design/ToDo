@@ -1,0 +1,9 @@
+.complete-todo-item:hover {
+    color: $green;
+    cursor: pointer;
+}
+
+.incomplete-todo-item:hover {
+    color: $red;
+    cursor: pointer;
+}
