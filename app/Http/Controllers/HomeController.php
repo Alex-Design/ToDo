@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use App\TodoItem;
+use App\Http\Controllers\Auth;
 use Mailgun\Mailgun;
 
 class HomeController extends Controller
@@ -27,7 +28,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $todoItems = DB::select('select * from todo_items where completed_on is NULL order by created_on DESC');
+        // TODO parameterize
+        $todoItems = DB::select('select * from todo_items where completed_on is NULL && user_id =' . auth()->user()->id . ' order by created_on DESC');
 
         return view('home', ['todoItems' => $todoItems]);
     }
@@ -39,14 +41,15 @@ class HomeController extends Controller
      */
     public function completeList()
     {
-        $completeTodoItems = DB::select('select * from todo_items where completed_on is not NULL order by completed_on DESC');
+        // TODO parameterize
+        $completeTodoItems = DB::select('select * from todo_items where completed_on is not NULL && user_id =' . auth()->user()->id . ' order by completed_on DESC');
             
         return view('complete', ['todoItems' => $completeTodoItems]);
     }
     
     
     public function addTask(Request $request)
-    {
+    {   
         $validator = Validator::make($request->all(), [
             'title' => 'required|max:255',
             'body' => 'required|max:1000',
@@ -60,9 +63,10 @@ class HomeController extends Controller
             $task = new TodoItem();
             $task->title = $request->title;
             $task->body = $request->body;
+            $task->user_id = auth()->user()->id;
             $task->save();
             
-            $to = '';
+            $to = $task->user->email;
             $subject = 'ToDo Task Added';
             $text = 'Task Added.';
             
@@ -77,8 +81,8 @@ class HomeController extends Controller
         $task = TodoItem::find((int)$request->task);
         $task->completed_on = date("Y-m-d H:i:s");
         $task->save();
-
-        $to = '';
+        
+        $to = $task->user->email;
         $subject = 'ToDo Task Complete!';
         $text = 'Congratulations!';
 
@@ -106,7 +110,7 @@ class HomeController extends Controller
         
         # Make the call to the client.
         $result = $mg->messages()->send($domain, [
-            'from' => 'Alex <mailgun@sandboxd44b2cc5f4f5483faaa50e64bc1f3d04.mailgun.org>',
+            'from' => 'Alex <mailgun@'. $domain . '>',
             'to' => '<' . $to . '>',
             'subject' => $subject,
             'text' => $text

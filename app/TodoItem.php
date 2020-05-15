@@ -13,6 +13,16 @@ class TodoItem extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'body', 'completed_on'
+        'title', 'body', 'completed_on', 'user_id'
     ];
+    
+    /**
+     * The relationship to the owning user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
