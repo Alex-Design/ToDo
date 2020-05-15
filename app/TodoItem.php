@@ -13,6 +13,6 @@ class TodoItem extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'body'
+        'title', 'body', 'completed_on'
     ];
 }

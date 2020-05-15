@@ -65,6 +65,45 @@ class HomeController extends Controller
         }
     }
     
+    public function completeTask(Request $request)
+    {
+//        $validator = Validator::make($request->all(), [
+//            'title' => 'required|max:255',
+//            'body' => 'required|max:1000',
+//        ]);
+
+//        if ($validator->fails()) {
+//            return redirect('home')
+//                ->withErrors($validator)
+//                ->withInput();
+//        } else {
+        
+            $task = TodoItem::find((int)$request->task);
+            $task->completed_on = date("Y-m-d H:i:s");
+            $task->save();
+
+            return redirect('/home');
+//        }
+    }
     
-//            $task->completed_on = new DateTime();
+    public function incompleteTask(Request $request)
+    {
+//        $validator = Validator::make($request->all(), [
+//            'title' => 'required|max:255',
+//            'body' => 'required|max:1000',
+//        ]);
+
+//        if ($validator->fails()) {
+//            return redirect('home')
+//                ->withErrors($validator)
+//                ->withInput();
+//        } else {
+        
+            $task = TodoItem::find((int)$request->task);
+            $task->completed_on = null;
+            $task->save();
+
+            return redirect('/complete');
+//        }
+    }
 }

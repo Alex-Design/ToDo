@@ -13,9 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Base route
+Route::get('/', 'HomeController@index')->name('home');
 
 Auth::routes();
 
@@ -25,3 +24,5 @@ Route::get('/complete', 'HomeController@completeList')->name('completeList');
 
 // Task modification routes
 Route::post('/task/add', 'HomeController@addTask')->name('addTask');
+Route::post('/task/complete', 'HomeController@completeTask')->name('completeTask');
+Route::post('/task/incomplete', 'HomeController@incompleteTask')->name('incompleteTask');

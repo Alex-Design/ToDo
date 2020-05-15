@@ -11,11 +11,17 @@
                         <div class="col-md-3">
                             @if($markAction === 'markComplete')
                                 <div class="complete-todo-item float-right" identifier="todo-item-{{ $todoItem->id }}">
-                                    Mark Complete
+                                    <form method="POST" action="/task/complete?task={{ $todoItem->id }}">
+                                           {{ csrf_field() }}
+                                           <button type="submit" class="btn btn-success">Mark Complete</button>
+                                    </form>
                                 </div>
                             @else
                                 <div class="incomplete-todo-item float-right" identifier="todo-item-{{ $todoItem->id }}">
-                                    Mark Incomplete
+                                   <form method="POST" action="/task/incomplete?task={{ $todoItem->id }}">
+                                           {{ csrf_field() }}
+                                           <button type="submit" class="btn btn-danger">Mark Incomplete</button>
+                                    </form>
                                 </div>
                             @endif
                         </div>
