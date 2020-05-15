@@ -19,6 +19,9 @@ Route::get('/', function () {
 
 Auth::routes();
 
+// Standard navigation routes
 Route::get('/home', 'HomeController@index')->name('home');
-
 Route::get('/complete', 'HomeController@completeList')->name('completeList');
+
+// Task modification routes
+Route::post('/task/add', 'HomeController@addTask')->name('addTask');

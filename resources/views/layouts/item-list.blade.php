@@ -1,5 +1,5 @@
 @foreach ($items as $todoItem)
-    <div class="row justify-content-center">
+    <div class="row justify-content-center existing-todo-item">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">

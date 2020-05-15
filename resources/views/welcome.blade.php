@@ -86,7 +86,7 @@
 
                 <div class="links">
                     <!-- TODO change to github link of this project -->
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                    <a href="https://github.com/Alex-Design/ToDo">GitHub</a>
                 </div>
             </div>
         </div>

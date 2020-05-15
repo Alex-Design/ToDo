@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use App\TodoItem;
 
 class HomeController extends Controller
 {
@@ -24,7 +26,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $todoItems = DB::select('select * from todo_items where completed_on is NULL');
+        $todoItems = DB::select('select * from todo_items where completed_on is NULL order by created_on DESC');
 
         return view('home', ['todoItems' => $todoItems]);
     }
@@ -36,8 +38,33 @@ class HomeController extends Controller
      */
     public function completeList()
     {
-        $completeTodoItems = DB::select('select * from todo_items where completed_on is not NULL');
+        $completeTodoItems = DB::select('select * from todo_items where completed_on is not NULL order by completed_on DESC');
 
         return view('complete', ['todoItems' => $completeTodoItems]);
     }
+    
+    
+    public function addTask(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|max:255',
+            'body' => 'required|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('home')
+                ->withErrors($validator)
+                ->withInput();
+        } else {
+            $task = new TodoItem();
+            $task->title = $request->title;
+            $task->body = $request->body;
+            $task->save();
+
+            return redirect('/home');
+        }
+    }
+    
+    
+//            $task->completed_on = new DateTime();
 }
