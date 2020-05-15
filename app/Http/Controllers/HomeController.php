@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use App\TodoItem;
+use Mailgun\Mailgun;
 
 class HomeController extends Controller
 {
@@ -39,7 +40,7 @@ class HomeController extends Controller
     public function completeList()
     {
         $completeTodoItems = DB::select('select * from todo_items where completed_on is not NULL order by completed_on DESC');
-
+            
         return view('complete', ['todoItems' => $completeTodoItems]);
     }
     
@@ -60,50 +61,61 @@ class HomeController extends Controller
             $task->title = $request->title;
             $task->body = $request->body;
             $task->save();
-
+            
+            $to = '';
+            $subject = 'ToDo Task Added';
+            $text = 'Task Added.';
+            
+            $this->sendEmail($to, $subject, $text);
+        
             return redirect('/home');
         }
     }
     
     public function completeTask(Request $request)
     {
-//        $validator = Validator::make($request->all(), [
-//            'title' => 'required|max:255',
-//            'body' => 'required|max:1000',
-//        ]);
+        $task = TodoItem::find((int)$request->task);
+        $task->completed_on = date("Y-m-d H:i:s");
+        $task->save();
 
-//        if ($validator->fails()) {
-//            return redirect('home')
-//                ->withErrors($validator)
-//                ->withInput();
-//        } else {
-        
-            $task = TodoItem::find((int)$request->task);
-            $task->completed_on = date("Y-m-d H:i:s");
-            $task->save();
+        $to = '';
+        $subject = 'ToDo Task Complete!';
+        $text = 'Congratulations!';
 
-            return redirect('/home');
-//        }
+        $this->sendEmail($to, $subject, $text);
+
+        return redirect('/home');
     }
     
     public function incompleteTask(Request $request)
     {
-//        $validator = Validator::make($request->all(), [
-//            'title' => 'required|max:255',
-//            'body' => 'required|max:1000',
-//        ]);
+        $task = TodoItem::find((int)$request->task);
+        $task->completed_on = null;
+        $task->save();
 
-//        if ($validator->fails()) {
-//            return redirect('home')
-//                ->withErrors($validator)
-//                ->withInput();
-//        } else {
+        return redirect('/complete');
+    }
+    
+    public function sendEmail($to, $subject, $text) 
+    {   
+        $mailgunKey = config('services.mailgun.secret');
+        $mailgunDomain = config('services.mailgun.domain');
         
-            $task = TodoItem::find((int)$request->task);
-            $task->completed_on = null;
-            $task->save();
+        $mg = Mailgun::create($mailgunKey);
+        $domain = $mailgunDomain;
+        
+        # Make the call to the client.
+        $result = $mg->messages()->send($domain, [
+            'from' => 'Alex <mailgun@sandboxd44b2cc5f4f5483faaa50e64bc1f3d04.mailgun.org>',
+            'to' => '<' . $to . '>',
+            'subject' => $subject,
+            'text' => $text
+        ]);
 
-            return redirect('/complete');
-//        }
+        if ($result->getMessage() === 'Queued. Thank you.') {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
