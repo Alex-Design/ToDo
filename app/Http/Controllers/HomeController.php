@@ -28,9 +28,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // TODO parameterize
-        $todoItems = DB::select('select * from todo_items where completed_on is NULL && user_id =' . auth()->user()->id . ' order by created_on DESC');
-
+        $todoItems = DB::table('todo_items')->whereNull('completed_on')->where('user_id', auth()->user()->id)->orderByDesc('created_on')->get();
         return view('home', ['todoItems' => $todoItems]);
     }
     
@@ -41,9 +39,7 @@ class HomeController extends Controller
      */
     public function completeList()
     {
-        // TODO parameterize
-        $completeTodoItems = DB::select('select * from todo_items where completed_on is not NULL && user_id =' . auth()->user()->id . ' order by completed_on DESC');
-            
+        $completeTodoItems = DB::table('todo_items')->whereNotNull('completed_on')->where('user_id', auth()->user()->id)->orderByDesc('completed_on')->get();
         return view('complete', ['todoItems' => $completeTodoItems]);
     }
     
