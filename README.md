@@ -9,6 +9,7 @@ ToDo is a simple to-do list.
 - Git
 - Composer
 - npm
+- MySQL
 - A Mailgun account / API credentials (domain and key)
 
 ## Running the application
