@@ -9,6 +9,10 @@
                             <br />
                             <div class="timestamp">
                                 <i>Created: {{ date('D dS M Y, g:i A', strtotime($todoItem->created_on)) }}</i>
+                                @if($todoItem->completed_on)
+                                    <br />
+                                    <i>Completed: {{ date('D dS M Y, g:i A', strtotime($todoItem->completed_on)) }}</i>
+                                @endif
                             </div>
                         </div>
                         
