@@ -1,4 +1,3 @@
-
 <form action="/task/add" method="POST" class="form-horizontal new-task-form">
     {{ csrf_field() }}    
     <div class="row justify-content-center existing-todo-item">

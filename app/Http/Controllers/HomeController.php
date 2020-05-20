@@ -75,25 +75,44 @@ class HomeController extends Controller
     public function completeTask(Request $request)
     {
         $task = TodoItem::find((int)$request->task);
-        $task->completed_on = date("Y-m-d H:i:s");
-        $task->save();
-        
-        $to = $task->user->email;
-        $subject = 'ToDo Task Complete!';
-        $text = 'Congratulations!';
+        $ownership = $this->checkTaskOwnership($task, auth()->user()->id);
+ 
+        if ($ownership === false) {
+            return redirect('home')
+                ->withErrors(['ownership' => 'The associated task is not owned by you, and so cannot be modified.']);
+        } else {
+            $task->completed_on = date("Y-m-d H:i:s");
+            $task->save();
 
-        $this->sendEmail($to, $subject, $text);
+            $to = $task->user->email;
+            $subject = 'ToDo Task Complete!';
+            $text = 'Congratulations!';
 
-        return redirect('/home');
+            $this->sendEmail($to, $subject, $text);
+
+            return redirect('/home');
+        }
     }
     
     public function incompleteTask(Request $request)
     {
         $task = TodoItem::find((int)$request->task);
-        $task->completed_on = null;
-        $task->save();
+        $ownership = $this->checkTaskOwnership($task, auth()->user()->id);
+        
+        if ($ownership === false) {
+            return redirect('complete')
+                ->withErrors(['ownership' => 'The associated task is not owned by you, and so cannot be modified.']);
+        } else {
+            $task->completed_on = null;
+            $task->save();
 
-        return redirect('/complete');
+            return redirect('/complete');
+        }   
+    }
+    
+    public function checkTaskOwnership(TodoItem $task, $userId)
+    {
+        return $task->user->id === $userId;
     }
     
     public function sendEmail($to, $subject, $text) 
@@ -106,7 +125,7 @@ class HomeController extends Controller
         
         # Make the call to the client.
         $result = $mg->messages()->send($domain, [
-            'from' => 'Alex <mailgun@'. $domain . '>',
+            'from' => 'ToDo <mailgun@'. $domain . '>',
             'to' => '<' . $to . '>',
             'subject' => $subject,
             'text' => $text
